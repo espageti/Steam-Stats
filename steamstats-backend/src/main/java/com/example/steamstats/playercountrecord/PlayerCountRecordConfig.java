@@ -40,7 +40,7 @@ public class PlayerCountRecordConfig {
                             playerCount,  // Player count from the API
                             LocalDateTime.now() // Recorded now
                     );
-
+                    System.out.println("Adding Player count Record " + record);
                     // Save the record to the database
                     repository.save(record);
                 }
