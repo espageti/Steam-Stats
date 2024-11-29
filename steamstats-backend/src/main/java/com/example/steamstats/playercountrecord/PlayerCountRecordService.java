@@ -1,7 +1,12 @@
 package com.example.steamstats.playercountrecord;
 
+import com.example.steamstats.game.GameRepository;
+import com.example.steamstats.game.GameService;
+import com.example.steamstats.game.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,21 +14,61 @@ import java.util.List;
 @Service
 public class PlayerCountRecordService {
 
-    private final PlayerCountRecordRepository playerCountRecordRepository;
+    private final PlayerCountRecordRepository repository;
+    private final GameRepository gameRepository;
+    private final GameService gameService;
 
-    @Autowired
-    public PlayerCountRecordService(PlayerCountRecordRepository playerCountRecordRepository) {
-        this.playerCountRecordRepository = playerCountRecordRepository;
+    public PlayerCountRecordService(PlayerCountRecordRepository repository, GameRepository gameRepository, GameService gameService) {
+        this.repository = repository;
+        this.gameRepository = gameRepository;
+        this.gameService = gameService;
+    }
+
+    @Scheduled(cron = "0 0 * * * *") // Runs at the top of every minute (adjust as needed)
+    public void updatePlayerCounts() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Retrieve all games from the repository
+        List<Game> games = gameRepository.findAll();
+
+        for (Game game : games) {
+            Long gameId = game.getAppId(); // Get the Steam ID of the game
+            String url = String.format("https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=%d", gameId);
+
+            try {
+                // Call the Steam API and parse the response
+                PlayerCountResponse response = restTemplate.getForObject(url, PlayerCountResponse.class);
+
+                if (response != null && response.getResponse() != null) {
+                    int playerCount = response.getResponse().getPlayerCount(); // Get the player count
+
+                    PlayerCountRecord record = new PlayerCountRecord(
+                            gameId,  // Use the game ID
+                            playerCount,  // Player count from the API
+                            LocalDateTime.now() // Recorded now
+                    );
+
+                    System.out.println("Adding Player count Record: " + record);
+                    // Save the record to the database
+                    repository.save(record);
+                }
+            } catch (Exception e) {
+                System.out.println("Error updating player count for game ID " + gameId + ": " + e.getMessage());
+            }
+        }
+
+        // Update average player counts for all games
+        gameService.updateAveragePlayerCounts();
     }
 
     public PlayerCountRecord recordPlayerCount(Long gameId, Integer playerCount) {
         PlayerCountRecord record = new PlayerCountRecord(gameId, playerCount, LocalDateTime.now());
-        return playerCountRecordRepository.save(record);
+        return repository.save(record);
     }
 
 
     public List<PlayerCountRecord> getPlayerCountHistory(Long gameId) {
-        return playerCountRecordRepository.findByGameId(gameId);
+        return repository.findByGameId(gameId);
     }
 
 }
