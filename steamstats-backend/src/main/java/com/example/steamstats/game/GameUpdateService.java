@@ -24,7 +24,7 @@ public class GameUpdateService {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "0 0 1/2 * *") // Run at the top of every hour
+    @Scheduled(cron = "0 0 1/2 * * *") // Run at the top of every hour
     public void updateGames() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         List<Game> games = new ArrayList<>();
