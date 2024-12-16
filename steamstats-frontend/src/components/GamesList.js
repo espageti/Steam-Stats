@@ -7,6 +7,7 @@ const GamesList = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    
     // Fetch games for the current page
     const fetchGames = async () => {
       try {

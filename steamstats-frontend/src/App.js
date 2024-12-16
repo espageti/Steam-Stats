@@ -4,6 +4,8 @@ import GamesList from './components/GamesList';
 import GameDetails from './components/GameDetails';
 import PlayerCounts from './components/PlayerCounts';
 
+global.baseURL = "https://steamstats-backend-d2f05f06780a.herokuapp.com"
+
 function App() {
     return (
         <Router>

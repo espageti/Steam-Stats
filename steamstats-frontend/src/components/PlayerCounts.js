@@ -15,9 +15,11 @@ const PlayerCounts = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+
+        console.log("Global baseURL is:", global.baseURL);
         const fetchGameDetails = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/v1/games/${id}/records`);
+                const response = await fetch(global.baseURL + `/api/v1/games/${id}/records`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch game details");
                 }
