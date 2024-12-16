@@ -17,61 +17,101 @@ import java.util.Optional;
 @Configuration
 public class GameConfig {
 
-    public static long[] APP_IDs = {
-            440, // Team Fortress 2
-            570, // DOTA 2
-    };
+    private static final int REQUEST_DELAY_MS = 1500; // 1.5 second delay between requests
+
+
+    public void fillAppIds() throws Exception
+    {
+        String apiUrl = "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json";
+
+        // Fetch JSON using RestTemplate
+        RestTemplate restTemplate = new RestTemplate();
+        String jsonResponse = restTemplate.getForObject(apiUrl, String.class);
+
+        // Parse JSON using ObjectMapper
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Map<String, List<Map<String, Object>>>> parsedResponse =
+                objectMapper.readValue(jsonResponse, new TypeReference<>() {});
+
+        // Extract apps array from JSON
+        List<Map<String, Object>> apps = parsedResponse.get("applist").get("apps");
+
+        // Add all app IDs to the HashSet
+        for (Map<String, Object> app : apps) {
+            Long appId = ((Number) app.get("appid")).longValue();
+            Globals.APP_IDs.add(appId);
+        }
+    }
 
     @Bean
     CommandLineRunner addGames(GameRepository repository) {
         return args -> {
+
+            fillAppIds();
+
+            String apiUrl;
+            String jsonResponse;
             RestTemplate restTemplate = new RestTemplate();
             List<Game> games = new ArrayList<>();
 
-            for (long appId : APP_IDs) {
-                System.out.println("Trying to add " + appId);
-                // Check if the game already exists in the repository
-                Optional<Game> existingGame = repository.findById(appId);
-                if (existingGame.isPresent()) {
-                    System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
-                    continue;
-                }
+            for (long appId : Globals.APP_IDs) {
+                boolean rateLimit = false;
+                do {
+                    if(rateLimit)
+                    {
+                        Thread.sleep(REQUEST_DELAY_MS);
+                    }
+                    rateLimit = false;
+                    // Sleep for a short period before making the next request
+                    Thread.sleep(REQUEST_DELAY_MS); // Delay of 1 second
 
-                try {
-                    String apiUrl = "https://store.steampowered.com/api/appdetails?appids=" + appId;
-
-                    // Call the Steam API using RestTemplate
-                    ObjectMapper mapper = new ObjectMapper();
-                    String jsonResponse = restTemplate.getForObject(apiUrl, String.class);
-                    Map<String, GameDetailsResponse> responseMap = mapper.readValue(jsonResponse, new TypeReference<Map<String, GameDetailsResponse>>() {});
-                    GameDetailsResponse gameResponse = responseMap.get(String.valueOf(appId));
-
-                    if (gameResponse != null && gameResponse.getData() != null) {
-                        GameDetailsResponse.GameData appData = gameResponse.getData();
-                        String name = appData.getName();
-                        String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
-                        String releaseDateStr = appData.getReleaseDate().getDate();
-
-                        LocalDate releaseDate = LocalDate.now();
-                        try {
-                            releaseDate = LocalDate.parse(releaseDateStr, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
-                        } catch (Exception e) {
-                            System.out.println("Error parsing release date for " + name + ": " + e.getMessage());
-                        }
-
-                        Game game = new Game(appId, name, developer, releaseDate);
-                        System.out.println("Going to add" + game);
-                        System.out.println(games.size());
-                        games.add(game);
-                        System.out.println(games.size());
-
+                    System.out.println("Trying to add " + appId);
+                    // Check if the game already exists in the repository
+                    Optional<Game> existingGame = repository.findById(appId);
+                    if (existingGame.isPresent()) {
+                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
+                        continue;
                     }
 
-                } catch (Exception e) {
-                    System.out.println("Error fetching data for app ID " + appId + ": " + e.getMessage());
-                }
+                    try {
+                        apiUrl = "https://store.steampowered.com/api/appdetails?appids=" + appId + "&key=" + System.getenv("STEAM_API_KEY");
+
+                        // Call the Steam API using RestTemplate
+                        ObjectMapper mapper = new ObjectMapper();
+                        jsonResponse = restTemplate.getForObject(apiUrl, String.class);
+                        Map<String, GameDetailsResponse> responseMap = mapper.readValue(jsonResponse, new TypeReference<Map<String, GameDetailsResponse>>() {
+                        });
+                        GameDetailsResponse gameResponse = responseMap.get(String.valueOf(appId));
+
+                        if (gameResponse != null && gameResponse.getData() != null) {
+                            GameDetailsResponse.GameData appData = gameResponse.getData();
+                            String name = appData.getName();
+                            String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
+                            String releaseDateStr = appData.getReleaseDate().getDate();
+
+                            LocalDate releaseDate = LocalDate.now();
+                            try {
+                                releaseDate = LocalDate.parse(releaseDateStr, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+                            } catch (Exception e) {
+                                System.out.println("Error parsing release date for " + name + ": " + e.getMessage());
+                            }
+
+                            Game game = new Game(appId, name, developer, releaseDate);
+                            System.out.println("Going to add " + game);
+                            games.add(game);
+                        }
+
+                    } catch (Exception e) {
+                        if(e.getMessage().contains("429"))
+                        {
+                            rateLimit = true;
+                        }
+                        System.out.println("Error fetching data for app ID " + appId + ": " + e.getMessage());
+                    }
+                } while(rateLimit);
             }
 
+            // Save all fetched games to the repository
             repository.saveAll(games);
         };
     }
