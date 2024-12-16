@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("https://resplendent-piroshki-ed59ef.netlify.app/")
                         .allowedMethods("GET", "POST", "PUT", "DELETE");
             }
         };
