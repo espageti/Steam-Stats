@@ -20,6 +20,7 @@ public class GameUpdateService {
     private static final int REQUEST_DELAY_MS = 1500;
     private final GameRepository repository;
 
+    private final int BATCH_SIZE = 1000;
     public GameUpdateService(GameRepository repository) {
         this.repository = repository;
     }
@@ -27,9 +28,21 @@ public class GameUpdateService {
     @Scheduled(cron = "0 0 1/2 * * *") // Run at the top of every hour
     public void updateGames() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        List<Game> games = new ArrayList<>();
+        List<Game> games = new ArrayList<Game>();
 
+        int i = 0;
+        int num = 0;
+        long numGames = Globals.APP_IDs.size();
         for (long appId : Globals.APP_IDs) {
+            if(i == BATCH_SIZE)
+            {
+                repository.saveAll(games);
+                i = 0;
+                games = new ArrayList<Game>();
+            }
+            num++;
+            System.out.println("Trying to save record " + num + "/" + numGames);
+            i++;
             boolean rateLimit = false;
             do {
                 if (rateLimit) {
@@ -81,7 +94,9 @@ public class GameUpdateService {
                 }
             }while(rateLimit);
         }
-
-        repository.saveAll(games);
+        if(i != 0)
+        {
+            repository.saveAll(games);
+        }
     }
 }

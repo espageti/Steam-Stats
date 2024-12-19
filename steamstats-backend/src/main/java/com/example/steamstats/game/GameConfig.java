@@ -20,6 +20,7 @@ public class GameConfig {
     private static final int REQUEST_DELAY_MS = 1500; // 1.5 second delay between requests
 
 
+    private final int BATCH_SIZE = 1000;
     public void fillAppIds() throws Exception
     {
         String apiUrl = "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json";
@@ -54,8 +55,21 @@ public class GameConfig {
             RestTemplate restTemplate = new RestTemplate();
             List<Game> games = new ArrayList<>();
 
+            int i = 0;
+            int num = 0;
+            long numGames = Globals.APP_IDs.size();
             for (long appId : Globals.APP_IDs) {
                 boolean rateLimit = false;
+                i++;
+                num++;
+                if(i == BATCH_SIZE)
+                {
+                    repository.saveAll(games);
+                    i = 0;
+                    games = new ArrayList<Game>();
+                }
+
+                System.out.println("Trying to save record " + num + "/" + numGames);
                 do {
                     if(rateLimit)
                     {
@@ -110,9 +124,11 @@ public class GameConfig {
                     }
                 } while(rateLimit);
             }
-
-            // Save all fetched games to the repository
-            repository.saveAll(games);
+            //save anything leftover
+            if(i != 0)
+            {
+                repository.saveAll(games);
+            }
         };
     }
 }
