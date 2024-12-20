@@ -28,7 +28,11 @@ public class GameService {
     }
 
     public List<Game> getPopularGames(int page, int limit) {
-        Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "averagePlayerCount")); // Sort by popularity
+        Pageable pageable = PageRequest.of(
+                page,
+                limit,
+                Sort.by(Sort.Order.desc("averagePlayerCount").nullsLast()) // Sort by popularity, NULLS LAST
+        );
         return gameRepository.findAll(pageable).getContent();
     }
 
