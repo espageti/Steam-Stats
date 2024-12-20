@@ -48,87 +48,87 @@ public class GameConfig {
     CommandLineRunner addGames(GameRepository repository) {
         return args -> {
 
-            fillAppIds();
-
-            String apiUrl;
-            String jsonResponse;
-            RestTemplate restTemplate = new RestTemplate();
-            List<Game> games = new ArrayList<>();
-
-            int i = 0;
-            int num = 0;
-            long numGames = Globals.APP_IDs.size();
-            for (long appId : Globals.APP_IDs) {
-                boolean rateLimit = false;
-                i++;
-                num++;
-                if(i == BATCH_SIZE)
-                {
-                    repository.saveAll(games);
-                    i = 0;
-                    games = new ArrayList<Game>();
-                }
-
-                System.out.println("Trying to save record " + num + "/" + numGames);
-                do {
-                    if(rateLimit)
-                    {
-                        Thread.sleep(REQUEST_DELAY_MS);
-                    }
-                    rateLimit = false;
-                    // Sleep for a short period before making the next request
-                    Thread.sleep(REQUEST_DELAY_MS); // Delay of 1 second
-
-                    System.out.println("Trying to add " + appId);
-                    // Check if the game already exists in the repository
-                    Optional<Game> existingGame = repository.findById(appId);
-                    if (existingGame.isPresent()) {
-                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
-                        continue;
-                    }
-
-                    try {
-                        apiUrl = "https://store.steampowered.com/api/appdetails?appids=" + appId + "&key=" + System.getenv("STEAM_API_KEY");
-
-                        // Call the Steam API using RestTemplate
-                        ObjectMapper mapper = new ObjectMapper();
-                        jsonResponse = restTemplate.getForObject(apiUrl, String.class);
-                        Map<String, GameDetailsResponse> responseMap = mapper.readValue(jsonResponse, new TypeReference<Map<String, GameDetailsResponse>>() {
-                        });
-                        GameDetailsResponse gameResponse = responseMap.get(String.valueOf(appId));
-
-                        if (gameResponse != null && gameResponse.getData() != null) {
-                            GameDetailsResponse.GameData appData = gameResponse.getData();
-                            String name = appData.getName();
-                            String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
-                            String releaseDateStr = appData.getReleaseDate().getDate();
-
-                            LocalDate releaseDate = LocalDate.now();
-                            try {
-                                releaseDate = LocalDate.parse(releaseDateStr, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
-                            } catch (Exception e) {
-                                System.out.println("Error parsing release date for " + name + ": " + e.getMessage());
-                            }
-
-                            Game game = new Game(appId, name, developer, releaseDate);
-                            System.out.println("Going to add " + game);
-                            games.add(game);
-                        }
-
-                    } catch (Exception e) {
-                        if(e.getMessage().contains("429"))
-                        {
-                            rateLimit = true;
-                        }
-                        System.out.println("Error fetching data for app ID " + appId + ": " + e.getMessage());
-                    }
-                } while(rateLimit);
-            }
-            //save anything leftover
-            if(i != 0)
-            {
-                repository.saveAll(games);
-            }
+//            fillAppIds();
+//
+//            String apiUrl;
+//            String jsonResponse;
+//            RestTemplate restTemplate = new RestTemplate();
+//            List<Game> games = new ArrayList<>();
+//
+//            int i = 0;
+//            int num = 0;
+//            long numGames = Globals.APP_IDs.size();
+//            for (long appId : Globals.APP_IDs) {
+//                boolean rateLimit = false;
+//                i++;
+//                num++;
+//                if(i == BATCH_SIZE)
+//                {
+//                    repository.saveAll(games);
+//                    i = 0;
+//                    games = new ArrayList<Game>();
+//                }
+//
+//                System.out.println("Trying to save game " + num + "/" + numGames);
+//                do {
+//                    if(rateLimit)
+//                    {
+//                        Thread.sleep(REQUEST_DELAY_MS);
+//                    }
+//                    rateLimit = false;
+//                    // Sleep for a short period before making the next request
+//                    Thread.sleep(REQUEST_DELAY_MS); // Delay of 1 second
+//
+//                    System.out.println("Trying to add " + appId);
+//                    // Check if the game already exists in the repository
+//                    Optional<Game> existingGame = repository.findById(appId);
+//                    if (existingGame.isPresent()) {
+//                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
+//                        continue;
+//                    }
+//
+//                    try {
+//                        apiUrl = "https://store.steampowered.com/api/appdetails?appids=" + appId + "&key=" + System.getenv("STEAM_API_KEY");
+//
+//                        // Call the Steam API using RestTemplate
+//                        ObjectMapper mapper = new ObjectMapper();
+//                        jsonResponse = restTemplate.getForObject(apiUrl, String.class);
+//                        Map<String, GameDetailsResponse> responseMap = mapper.readValue(jsonResponse, new TypeReference<Map<String, GameDetailsResponse>>() {
+//                        });
+//                        GameDetailsResponse gameResponse = responseMap.get(String.valueOf(appId));
+//
+//                        if (gameResponse != null && gameResponse.getData() != null) {
+//                            GameDetailsResponse.GameData appData = gameResponse.getData();
+//                            String name = appData.getName();
+//                            String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
+//                            String releaseDateStr = appData.getReleaseDate().getDate();
+//
+//                            LocalDate releaseDate = LocalDate.now();
+//                            try {
+//                                releaseDate = LocalDate.parse(releaseDateStr, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
+//                            } catch (Exception e) {
+//                                System.out.println("Error parsing release date for " + name + ": " + e.getMessage());
+//                            }
+//
+//                            Game game = new Game(appId, name, developer, releaseDate);
+//                            System.out.println("Going to add " + game);
+//                            games.add(game);
+//                        }
+//
+//                    } catch (Exception e) {
+//                        if(e.getMessage().contains("429"))
+//                        {
+//                            rateLimit = true;
+//                        }
+//                        System.out.println("Error fetching data for app ID " + appId + ": " + e.getMessage());
+//                    }
+//                } while(rateLimit);
+//            }
+//            //save anything leftover
+//            if(i != 0)
+//            {
+//                repository.saveAll(games);
+//            }
         };
     }
 }
