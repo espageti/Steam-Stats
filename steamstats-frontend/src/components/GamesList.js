@@ -11,7 +11,7 @@ const GamesList = () => {
     // Fetch games for the current page
     const fetchGames = async () => {
       try {
-        const data = await getGamesByPage(currentPage, 10); // Provide default values in case of undefined
+        const data = await getGamesByPage(currentPage, 100); // Provide default values in case of undefined
         setGames(data);  // Ensure data is always an array
       } catch (error) {
         console.error("Failed to fetch games:", error);  // Log any errors
@@ -36,7 +36,7 @@ const GamesList = () => {
         {games && games.length > 0 ? (
           games.map(game => (
             <li key={game.appId}>
-              <Link to={`/games/${game.appId}`}>{game.title}</Link>
+              <Link to={`/games/${game.appId}`}>{game.title +": " + game.averagePlayerCount}</Link>
             </li>
           ))
         ) : (
