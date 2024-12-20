@@ -64,7 +64,7 @@ public class Game {
     }
 
     public double getAveragePlayerCount() {
-        return averagePlayerCount;
+        return averagePlayerCount != null ? averagePlayerCount : -1.0; //default to -1
     }
 
     public void setAveragePlayerCount(double averagePlayerCount) {
