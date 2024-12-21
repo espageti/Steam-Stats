@@ -39,6 +39,7 @@ const GameDetails = () => {
                     <h3>{game.title}</h3>
                     <p><strong>Developer:</strong> {game.developer}</p>
                     <p><strong>Release Date:</strong> {game.releaseDate}</p>
+                    <p><strong>Average Player Count:</strong> {game.averagePlayerCount.toFixed(2)}</p>
                 </div>
             ) : (
                 <p>Game not found.</p>

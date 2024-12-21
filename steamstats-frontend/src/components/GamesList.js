@@ -36,7 +36,7 @@ const GamesList = () => {
         {games && games.length > 0 ? (
           games.map(game => (
             <li key={game.appId}>
-              <Link to={`/games/${game.appId}`}>{game.title +": " + game.averagePlayerCount}</Link>
+              <Link to={`/games/${game.appId}`}>{game.title +": " + game.averagePlayerCount.toFixed(2)}</Link>
             </li>
           ))
         ) : (
