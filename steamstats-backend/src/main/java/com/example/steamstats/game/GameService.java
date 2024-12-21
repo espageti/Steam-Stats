@@ -28,12 +28,8 @@ public class GameService {
     }
 
     public List<Game> getPopularGames(int page, int limit) {
-        Pageable pageable = PageRequest.of(
-                page,
-                limit,
-                Sort.by(Sort.Order.desc("averagePlayerCount").nullsLast()) // Sort by popularity, NULLS LAST
-        );
-        return gameRepository.findAll(pageable).getContent();
+        Pageable pageable = PageRequest.of(page, limit);
+        return gameRepository.findAllWithNullsLast(pageable).getContent();
     }
 
     @Transactional
