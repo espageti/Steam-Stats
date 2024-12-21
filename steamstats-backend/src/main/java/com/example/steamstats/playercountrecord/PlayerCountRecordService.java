@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,14 +25,19 @@ public class PlayerCountRecordService {
         this.gameService = gameService;
     }
 
-    @Scheduled(cron = "0 0 * * * *") // Runs at the top of every minute (adjust as needed)
+    @Scheduled(cron = "0 0 */3 * * *") // Runs at the top of every minute (adjust as needed)
     public void updatePlayerCounts() {
         RestTemplate restTemplate = new RestTemplate();
 
         // Retrieve all games from the repository
         List<Game> games = gameRepository.findAll();
 
+        int index = 0;
+        int numGames = games.size();
+        LocalDateTime startTime = LocalDateTime.now();
         for (Game game : games) {
+            index++;
+            System.out.println("Trying to add player count record: " + index + "/" + numGames);
             Long gameId = game.getAppId(); // Get the Steam ID of the game
             String url = String.format("https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=%d", gameId);
 
@@ -56,6 +62,11 @@ public class PlayerCountRecordService {
                 System.out.println("Error updating player count for game ID " + gameId + ": " + e.getMessage());
             }
         }
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        System.out.println("Took " + duration + " To complete ");
+        System.out.println(startTime + " - " + endTime);
 
         // Update average player counts for all games
         gameService.updateAveragePlayerCounts();
