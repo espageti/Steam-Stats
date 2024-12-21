@@ -2,7 +2,7 @@ export const getGamesByPage = async (page, limit) => {
   try {
     const response = await fetch(global.baseURL +  `/api/v1/games/popular?page=${page}&limit=${limit}`);
     
-    console.log("Global baseURL is:", global.baseURL);
+    console.log("Global response url is:", response);
     if (!response.ok) {
       throw new Error('Failed to fetch games');
     }
