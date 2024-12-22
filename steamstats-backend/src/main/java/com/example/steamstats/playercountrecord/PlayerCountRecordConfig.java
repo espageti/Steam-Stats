@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
@@ -38,7 +37,7 @@ public class PlayerCountRecordConfig {
 //                    PlayerCountRecord record = new PlayerCountRecord(
 //                            gameId,  // Use the game ID
 //                            playerCount,  // Player count from the API
-//                            LocalDateTime.now() // Recorded now
+//                            ZonedDateTime.now(ZoneOffset.UTC); // Recorded now
 //                    );
 //                    System.out.println("Adding Player count Record " + record);
 //                    // Save the record to the database

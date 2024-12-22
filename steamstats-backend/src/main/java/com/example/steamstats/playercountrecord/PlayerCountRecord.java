@@ -1,7 +1,7 @@
 package com.example.steamstats.playercountrecord;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "player_count_record")
@@ -26,14 +26,14 @@ public class PlayerCountRecord {
     private Integer playerCount; // Number of players
 
     @Column(name = "recorded_at", nullable = false)
-    private LocalDateTime recordedAt; // Timestamp of when the count was recorded
+    private ZonedDateTime recordedAt; // Timestamp of when the count was recorded
 
     // Default constructor
     public PlayerCountRecord() {
     }
 
     // Constructor
-    public PlayerCountRecord(Long gameId, Integer playerCount, LocalDateTime recordedAt) {
+    public PlayerCountRecord(Long gameId, Integer playerCount, ZonedDateTime recordedAt) {
         this.gameId = gameId;
         this.playerCount = playerCount;
         this.recordedAt = recordedAt;
@@ -64,11 +64,11 @@ public class PlayerCountRecord {
         this.playerCount = playerCount;
     }
 
-    public LocalDateTime getRecordedAt() {
+    public ZonedDateTime getRecordedAt() {
         return recordedAt;
     }
 
-    public void setRecordedAt(LocalDateTime recordedAt) {
+    public void setRecordedAt(ZonedDateTime recordedAt) {
         this.recordedAt = recordedAt;
     }
 

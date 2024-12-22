@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -35,7 +36,7 @@ public class PlayerCountRecordService {
 
         int index = 0;
         int numGames = games.size();
-        LocalDateTime startTime = LocalDateTime.now();
+        ZonedDateTime startTime = ZonedDateTime.now(ZoneOffset.UTC);
         for (Game game : games) {
             index++;
             System.out.println("Trying to add player count record: " + index + "/" + numGames);
@@ -59,10 +60,10 @@ public class PlayerCountRecordService {
                         PlayerCountRecord record = new PlayerCountRecord(
                                 gameId,  // Use the game ID
                                 playerCount,  // Player count from the API
-                                LocalDateTime.now() // Recorded now
+                                ZonedDateTime.now(ZoneOffset.UTC) // Recorded now, make sure it's UTC
                         );
 
-                        System.out.println("Adding Player count Record: " + record + "at time " + LocalDateTime.now());
+                        System.out.println("Adding Player count Record: " + record + "at time " + ZonedDateTime.now(ZoneOffset.UTC));
                         // Save the record to the database
                         repository.save(record);
                     }
@@ -72,7 +73,7 @@ public class PlayerCountRecordService {
             } while (rateLimit);
         }
 
-        LocalDateTime endTime = LocalDateTime.now();
+        ZonedDateTime endTime = ZonedDateTime.now(ZoneOffset.UTC);
         Duration duration = Duration.between(startTime, endTime);
         System.out.println("Took " + duration + " To complete ");
         System.out.println(startTime + " - " + endTime);
@@ -83,7 +84,7 @@ public class PlayerCountRecordService {
     }
 
     public PlayerCountRecord recordPlayerCount(Long gameId, Integer playerCount) {
-        PlayerCountRecord record = new PlayerCountRecord(gameId, playerCount, LocalDateTime.now());
+        PlayerCountRecord record = new PlayerCountRecord(gameId, playerCount, ZonedDateTime.now(ZoneOffset.UTC));
         return repository.save(record);
     }
 
