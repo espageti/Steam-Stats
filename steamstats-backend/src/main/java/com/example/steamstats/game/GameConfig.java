@@ -102,14 +102,7 @@ public class GameConfig {
                             GameDetailsResponse.GameData appData = gameResponse.getData();
                             String name = appData.getName();
                             String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
-                            String releaseDateStr = appData.getReleaseDate().getDate();
-
-                            LocalDate releaseDate = LocalDate.now();
-                            try {
-                                releaseDate = LocalDate.parse(releaseDateStr, DateTimeFormatter.ofPattern("MMM dd, yyyy"));
-                            } catch (Exception e) {
-                                System.out.println("Error parsing release date for " + name + ": " + e.getMessage());
-                            }
+                            String releaseDate = appData.getReleaseDate().getDate();
 
                             Game game = new Game(appId, name, developer, releaseDate);
                             System.out.println("Going to add " + game);

@@ -13,7 +13,7 @@ public class Game {
 
     private String title;
     private String developer;
-    private LocalDate releaseDate;
+    private String releaseDate;
     @Column(name = "average_player_count")
     private Double averagePlayerCount; // Field used to determine popularity in the last
 
@@ -23,7 +23,7 @@ public class Game {
     }
 
     // Constructor
-    public Game(Long appId, String title, String developer, LocalDate releaseDate) {
+    public Game(Long appId, String title, String developer, String releaseDate) {
         this.appId = appId;
         this.title = title;
         this.developer = developer;
@@ -55,11 +55,11 @@ public class Game {
         this.developer = developer;
     }
 
-    public LocalDate getReleaseDate() {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(LocalDate releaseDate) {
+    public void setReleaseDate(String releaseDate) {
         this.releaseDate = releaseDate;
     }
 
