@@ -71,6 +71,13 @@ public class GameConfig {
 
                 System.out.println("Trying to save game " + num + "/" + numGames);
                 do {
+
+                    // Check if the game already exists in the repository
+                    Optional<Game> existingGame = repository.findById(appId);
+                    if (existingGame.isPresent()) {
+                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
+                        continue;
+                    }
                     if(rateLimit)
                     {
                         Thread.sleep(REQUEST_DELAY_MS);
@@ -80,12 +87,6 @@ public class GameConfig {
                     Thread.sleep(REQUEST_DELAY_MS); // Delay of 1 second
 
                     System.out.println("Trying to add " + appId);
-                    // Check if the game already exists in the repository
-                    Optional<Game> existingGame = repository.findById(appId);
-                    if (existingGame.isPresent()) {
-                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
-                        continue;
-                    }
 
                     try {
                         apiUrl = "https://store.steampowered.com/api/appdetails?appids=" + appId + "&key=" + System.getenv("STEAM_API_KEY");

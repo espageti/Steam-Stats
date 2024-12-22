@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class PlayerCountRecordService {
 
+    private static final int REQUEST_DELAY_MS = 1500;
     private final PlayerCountRecordRepository repository;
     private final GameRepository gameRepository;
     private final GameService gameService;
@@ -26,7 +27,7 @@ public class PlayerCountRecordService {
     }
 
     @Scheduled(cron = "0 0 */3 * * *") // Runs at the top of every minute (adjust as needed)
-    public void updatePlayerCounts() {
+    public void updatePlayerCounts() throws InterruptedException {
         RestTemplate restTemplate = new RestTemplate();
 
         // Retrieve all games from the repository
@@ -41,26 +42,34 @@ public class PlayerCountRecordService {
             Long gameId = game.getAppId(); // Get the Steam ID of the game
             String url = String.format("https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=%d", gameId);
 
-            try {
-                // Call the Steam API and parse the response
-                PlayerCountResponse response = restTemplate.getForObject(url, PlayerCountResponse.class);
+            boolean rateLimit = false;
 
-                if (response != null && response.getResponse() != null) {
-                    int playerCount = response.getResponse().getPlayerCount(); // Get the player count
-
-                    PlayerCountRecord record = new PlayerCountRecord(
-                            gameId,  // Use the game ID
-                            playerCount,  // Player count from the API
-                            LocalDateTime.now() // Recorded now
-                    );
-
-                    System.out.println("Adding Player count Record: " + record);
-                    // Save the record to the database
-                    repository.save(record);
+            do {
+                if(rateLimit)
+                {
+                    Thread.sleep(REQUEST_DELAY_MS);
                 }
-            } catch (Exception e) {
-                System.out.println("Error updating player count for game ID " + gameId + ": " + e.getMessage());
-            }
+                try {
+                    // Call the Steam API and parse the response
+                    PlayerCountResponse response = restTemplate.getForObject(url, PlayerCountResponse.class);
+
+                    if (response != null && response.getResponse() != null) {
+                        int playerCount = response.getResponse().getPlayerCount(); // Get the player count
+
+                        PlayerCountRecord record = new PlayerCountRecord(
+                                gameId,  // Use the game ID
+                                playerCount,  // Player count from the API
+                                LocalDateTime.now() // Recorded now
+                        );
+
+                        System.out.println("Adding Player count Record: " + record + "at time " + LocalDateTime.now());
+                        // Save the record to the database
+                        repository.save(record);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error updating player count for game ID " + gameId + ": " + e.getMessage());
+                }
+            } while (rateLimit);
         }
 
         LocalDateTime endTime = LocalDateTime.now();
@@ -70,6 +79,7 @@ public class PlayerCountRecordService {
 
         // Update average player counts for all games
         gameService.updateAveragePlayerCounts();
+
     }
 
     public PlayerCountRecord recordPlayerCount(Long gameId, Integer playerCount) {

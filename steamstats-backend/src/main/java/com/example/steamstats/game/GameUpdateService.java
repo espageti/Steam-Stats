@@ -25,7 +25,7 @@ public class GameUpdateService {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "0 0 1/2 * * *") // Run at the top of every hour
+    @Scheduled(cron = "0 0 0 */2 * *") // Run every other day, at 12 am
     public void updateGames() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         List<Game> games = new ArrayList<Game>();
@@ -41,14 +41,13 @@ public class GameUpdateService {
                 games = new ArrayList<Game>();
             }
             num++;
-            System.out.println("Trying to save record " + num + "/" + numGames);
+            System.out.println("Trying to save game " + num + "/" + numGames);
             i++;
             boolean rateLimit = false;
             do {
                 if (rateLimit) {
                     Thread.sleep(REQUEST_DELAY_MS);
                 }
-                Thread.sleep(REQUEST_DELAY_MS);
                 System.out.println("Trying to add " + appId);
                 // Check if the game already exists in the repository
                 Optional<Game> existingGame = repository.findById(appId);
