@@ -13,5 +13,6 @@ public interface PlayerCountRecordRepository extends JpaRepository<PlayerCountRe
     @Query("SELECT p.playerCount FROM PlayerCountRecord p WHERE p.gameId = :gameId AND p.recordedAt >= :since")
     List<Integer> findPlayerCountsInLast24Hours(Long gameId, ZonedDateTime since);
 
+    @Query("SELECT p FROM PlayerCountRecord p WHERE p.gameId = :gameId ORDER BY p.record_date ASC")
     List<PlayerCountRecord> findByGameId(Long gameId);
 }
