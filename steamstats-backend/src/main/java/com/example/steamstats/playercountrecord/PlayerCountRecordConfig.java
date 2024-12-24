@@ -4,6 +4,8 @@ package com.example.steamstats.playercountrecord;
 import com.example.steamstats.game.Game;
 import com.example.steamstats.game.GameRepository;
 import com.example.steamstats.game.GameService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @Configuration
 public class PlayerCountRecordConfig {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerCountRecordConfig.class);
     private static final int REQUEST_DELAY_MS = 1500;
 
     @Bean
@@ -29,6 +32,7 @@ public class PlayerCountRecordConfig {
             int index = 0;
             int numGames = games.size();
             ZonedDateTime startTime = ZonedDateTime.now(ZoneOffset.UTC);
+            logger.debug("Starting recording at ", startTime);
             for (Game game : games) {
                 index++;
                 System.out.println("Trying to add player count record: " + index + "/" + numGames);

@@ -15,13 +15,6 @@ public class PlayerCountRecordController {
         this.playerCountRecordService = playerCountRecordService;
     }
 
-    //i don't think I'll ever need this? like why would I
-    @PostMapping
-    public PlayerCountRecord recordPlayerCount(@RequestParam Long gameId, @RequestParam Integer playerCount) {
-        return playerCountRecordService.recordPlayerCount(gameId, playerCount);
-    }
-
-
 
     @GetMapping("/{appId}")
     public List<PlayerCountRecord> getPlayerCountHistory(@PathVariable Long appId) {

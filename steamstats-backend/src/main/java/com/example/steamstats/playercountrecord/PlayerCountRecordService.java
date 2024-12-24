@@ -3,6 +3,8 @@ package com.example.steamstats.playercountrecord;
 import com.example.steamstats.game.GameRepository;
 import com.example.steamstats.game.GameService;
 import com.example.steamstats.game.Game;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.List;
 @Service
 public class PlayerCountRecordService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PlayerCountRecordConfig.class);
     private static final int REQUEST_DELAY_MS = 1500;
     private final PlayerCountRecordRepository repository;
     private final GameRepository gameRepository;
@@ -37,6 +40,7 @@ public class PlayerCountRecordService {
         int index = 0;
         int numGames = games.size();
         ZonedDateTime startTime = ZonedDateTime.now(ZoneOffset.UTC);
+        logger.debug("Starting recording at ", startTime);
         for (Game game : games) {
             index++;
             System.out.println("Trying to add player count record: " + index + "/" + numGames);
@@ -75,7 +79,9 @@ public class PlayerCountRecordService {
 
         ZonedDateTime endTime = ZonedDateTime.now(ZoneOffset.UTC);
         Duration duration = Duration.between(startTime, endTime);
+        logger.debug("Took " + duration + " To complete ");
         System.out.println("Took " + duration + " To complete ");
+        logger.debug(startTime + " - " + endTime);
         System.out.println(startTime + " - " + endTime);
 
         // Update average player counts for all games
@@ -83,10 +89,6 @@ public class PlayerCountRecordService {
 
     }
 
-    public PlayerCountRecord recordPlayerCount(Long gameId, Integer playerCount) {
-        PlayerCountRecord record = new PlayerCountRecord(gameId, playerCount, ZonedDateTime.now(ZoneOffset.UTC));
-        return repository.save(record);
-    }
 
 
     public List<PlayerCountRecord> getPlayerCountHistory(Long gameId) {
