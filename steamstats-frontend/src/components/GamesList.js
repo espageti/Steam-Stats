@@ -3,18 +3,17 @@ import { getGamesByPage } from '../constants/apiService'; // Updated service for
 import { Link } from 'react-router-dom';
 
 const GamesList = () => {
-  const [games, setGames] = useState([]);  // Initialize as an empty array
+  const [games, setGames] = useState([]); // Initialize as an empty array
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    
     // Fetch games for the current page
     const fetchGames = async () => {
       try {
         const data = await getGamesByPage(currentPage, 100); // Provide default values in case of undefined
-        setGames(data);  // Ensure data is always an array
+        setGames(data); // Ensure data is always an array
       } catch (error) {
-        console.error("Failed to fetch games:", error);  // Log any errors
+        console.error('Failed to fetch games:', error); // Log any errors
       }
     };
 
@@ -30,26 +29,45 @@ const GamesList = () => {
   };
 
   return (
-    <div>
+    <div style = {{textAlign: 'center'}}>
       <h2>Games List</h2>
-      <ul>
-        {games && games.length > 0 ? (
-          games.map(game => (
-            <li key={game.appId}>
-              <Link to={`/games/${game.appId}`}>{game.title +": " + game.averagePlayerCount.toFixed(2)}</Link>
-            </li>
-          ))
-        ) : (
-          <p>No games available.</p>  // Fallback message when no games are present
-        )}
-      </ul>
+
+      {/* Games Table */}
+      <div style = {{display: 'inline-block'}}>
+        <table>
+          <thead>
+            <tr>
+              <th>App ID</th>
+              <th>Title</th>
+              <th>Average Player Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {games && games.length > 0 ? (
+              games.map(game => (
+                <tr key={game.appId}>
+                  <td>{game.appId}</td>
+                  <td>
+                    <Link to={`/games/${game.appId}`}>{game.title}</Link>
+                  </td>
+                  <td>{game.averagePlayerCount ? game.averagePlayerCount.toLocaleString() : 'N/A'}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3">Loading...</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination Controls */}
-      <div>
+      <div style={{ marginTop: '20px' }}>
         <button onClick={handlePreviousPage} disabled={currentPage === 1}>
           Previous
         </button>
-        <span>Page {currentPage}</span>
+        <span style={{ margin: '0 10px' }}>Page {currentPage}</span>
         <button onClick={handleNextPage} disabled={games.length < 10}>
           Next
         </button>

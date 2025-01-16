@@ -28,6 +28,16 @@ public class GameDetailsResponse {
         private String[] developers; // Changed to array to capture multiple developers
         private ReleaseDate release_date;
 
+        @JsonProperty("header_image")
+        public String getHeaderImage() {
+            return headerImage;
+        }
+
+        public void setHeaderImage(String headerImage) {
+            this.headerImage = headerImage;
+        }
+
+        private String headerImage;
         @JsonProperty("name")
         public String getName() {
             return name;
