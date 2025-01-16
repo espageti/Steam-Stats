@@ -1,6 +1,7 @@
 package com.example.steamstats.game;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "game")
@@ -12,14 +13,9 @@ public class Game {
 
     private String title;
     private String developer;
-
     private String releaseDate;
-
-
-
-    private String headerImage;
     @Column(name = "average_player_count")
-    private Double averagePlayerCount; // Field used to determine popularity in the last 24 hrs
+    private Double averagePlayerCount; // Field used to determine popularity in the last
 
 
     // Default constructor
@@ -27,12 +23,11 @@ public class Game {
     }
 
     // Constructor
-    public Game(Long appId, String title, String developer, String releaseDate, String headerImage) {
+    public Game(Long appId, String title, String developer, String releaseDate) {
         this.appId = appId;
         this.title = title;
         this.developer = developer;
         this.releaseDate = releaseDate;
-        this.headerImage = headerImage;
     }
 
     // Getters and Setters
@@ -60,13 +55,6 @@ public class Game {
         this.developer = developer;
     }
 
-    public String getHeaderImage() {
-        return headerImage;
-    }
-
-    public void setHeaderImage(String headerImage) {
-        this.headerImage = headerImage;
-    }
     public String getReleaseDate() {
         return releaseDate;
     }
@@ -90,7 +78,6 @@ public class Game {
                 ", title='" + title + '\'' +
                 ", developer='" + developer + '\'' +
                 ", releaseDate=" + releaseDate +
-                ", headerImage=" + headerImage +
                 ", averagePlayerCount=" + averagePlayerCount +
                 '}';
     }

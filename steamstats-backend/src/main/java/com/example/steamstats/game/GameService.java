@@ -68,7 +68,6 @@ public class GameService {
             game.setTitle(gameDetails.getTitle());
             game.setDeveloper(gameDetails.getDeveloper());
             game.setReleaseDate(gameDetails.getReleaseDate());
-            game.setHeaderImage(gameDetails.getHeaderImage());
             return gameRepository.save(game);
         }).orElseThrow(() -> new RuntimeException("Game not found with id: " + appId));
     }

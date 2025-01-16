@@ -6,6 +6,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,8 +72,8 @@ public class GameUpdateService {
                         String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
                         String releaseDate = appData.getReleaseDate().getDate();
 
-                        String headerImage = appData.getHeaderImage();
-                        Game game = new Game(appId, name, developer, releaseDate, headerImage);
+
+                        Game game = new Game(appId, name, developer, releaseDate);
                         System.out.println("Going to add" + game);
                         games.add(game);
                     }
