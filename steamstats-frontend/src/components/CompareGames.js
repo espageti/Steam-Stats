@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 const CompareGames = () => {
     const { ids } = useParams(); // Get the game IDs from the URL parameters
-    const gameIds = ids ? ids.split('&') : [];
+    const gameIds = React.useMemo(() => ids.split('&'), [ids]);
     const [games, setGames] = useState({}); // State to hold game details as a dictionary
     const [loading, setLoading] = useState(true); // Loading state
     const [error, setError] = useState(null); // Error state

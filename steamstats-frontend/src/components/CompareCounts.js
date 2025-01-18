@@ -9,7 +9,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 const CompareCounts = () => {
     const { ids } = useParams(); // Fetch multiple game IDs (e.g., "1&2&3")
-    const gameIds = ids ? ids.split('&') : [];
+    const gameIds = React.useMemo(() => ids.split('&'), [ids]);
     const [playerCounts, setPlayerCounts] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

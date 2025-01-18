@@ -30,6 +30,7 @@ const GamesList = () => {
     setCurrentPage(prev => prev - 1);
   };
 
+
   return (
     <div style = {{textAlign: 'center'}}>
       <h2>Games List</h2>
