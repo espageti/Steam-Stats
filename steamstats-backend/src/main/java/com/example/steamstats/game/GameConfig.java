@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Configuration
-@Profile("debug") //only load all that stuff if it's in debug mode
+@Profile({"debug", "setup"}) //only load all that stuff if it's in debug mode
 public class GameConfig {
 
     private static final int REQUEST_DELAY_MS = 1500; // 1.5 second delay between requests
