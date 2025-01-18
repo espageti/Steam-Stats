@@ -3,8 +3,7 @@ import { getGamesByPage } from '../constants/apiService'; // Updated service for
 import { Link } from 'react-router-dom';
 
 const GamesList = () => {
-  const [games, setGames] = useState([]); // Initialize as an empty array
-  const [loading, setLoading] = useState(true); // Loading state
+  const [games, setGames] = useState([]); // Initialize as an empty array\
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -12,8 +11,7 @@ const GamesList = () => {
     const fetchGames = async () => {
       try {
         const data = await getGamesByPage(currentPage, 100); // Provide default values in case of undefined
-        setGames(data); // Ensure data is always an array
-        setLoading(false); // Set loading to false after data is fetched
+        setGames(data); // Ensure data is always an array\
       } catch (error) {
         console.error('Failed to fetch games:', error); // Log any errors
       }
