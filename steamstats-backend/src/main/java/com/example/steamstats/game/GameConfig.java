@@ -72,12 +72,12 @@ public class GameConfig {
                 System.out.println("Trying to save game " + num + "/" + numGames);
                 do {
 
-                    // Check if the game already exists in the repository
-                    Optional<Game> existingGame = repository.findById(appId);
-                    if (existingGame.isPresent()) {
-                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
-                        continue;
-                    }
+                    // Check if the game already exists in the repository (don't do for startup, update headerImages)
+//                    Optional<Game> existingGame = repository.findById(appId);
+//                    if (existingGame.isPresent()) {
+//                        System.out.println("Game with ID " + appId + " already exists in the database. Skipping.");
+//                        continue;
+//                    }
                     if(rateLimit)
                     {
                         Thread.sleep(REQUEST_DELAY_MS);
