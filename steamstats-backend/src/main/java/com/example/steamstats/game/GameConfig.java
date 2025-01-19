@@ -104,7 +104,13 @@ public class GameConfig {
                             String developer = appData.getDevelopers() != null && appData.getDevelopers().length > 0 ? appData.getDevelopers()[0] : "Unknown";
                             String releaseDate = appData.getReleaseDate().getDate();
                             String headerImage = appData.getHeaderImage();
+
+                            Optional<Game> existingGame = repository.findById(appId);
+
                             Game game = new Game(appId, name, developer, releaseDate, headerImage);
+                            if (existingGame.isPresent()) {
+                                game.setAveragePlayerCount(existingGame.get().getAveragePlayerCount());
+                            }
                             System.out.println("Going to add " + game);
                             games.add(game);
                         }
