@@ -34,14 +34,16 @@ public class GameService {
     }
 
     @Transactional
-    public void updateAveragePlayerCounts() {
+    public void updateAveragePlayerCount(Long appId) {
         ZonedDateTime since = ZonedDateTime.now(ZoneOffset.UTC).minusHours(24);
 
-        // Fetch all games
-        List<Game> games = gameRepository.findAll();
+        // Fetch the game by appId
+        Optional<Game> optionalGame = gameRepository.findById(appId);
 
-        for (Game game : games) {
-            // Fetch player counts for the last 24 hours
+        if (optionalGame.isPresent()) {
+            Game game = optionalGame.get();
+
+            // Fetch player counts for the last 24 hours for the specific game
             List<Integer> playerCounts = playerCountRecordRepository.findPlayerCountsInLast24Hours(game.getAppId(), since);
 
             // Calculate average if there are records
@@ -51,9 +53,15 @@ public class GameService {
                 // Update game entity
                 game.setAveragePlayerCount(average);
                 gameRepository.save(game);
+                System.out.println("Updated average player count for game ID: " + appId);
+            } else {
+                System.out.println("No player count records found for game ID: " + appId);
             }
+        } else {
+            System.out.println("Game with ID " + appId + " not found.");
         }
     }
+
 
     public Optional<Game> getGameById(Long appId) {
         return gameRepository.findById(appId);
