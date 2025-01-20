@@ -64,6 +64,7 @@ public class PlayerCountRecordConfig {
                             System.out.println("Adding Player count Record: " + record + "at time " + ZonedDateTime.now(ZoneOffset.UTC));
                             // Save the record to the database
                             repository.save(record);
+                            gameService.updateAveragePlayerCount(gameId);
                         }
                     } catch (Exception e) {
                         System.out.println("Error updating player count for game ID " + gameId + ": " + e.getMessage());
@@ -76,8 +77,6 @@ public class PlayerCountRecordConfig {
             System.out.println("Took " + duration + " To complete ");
             System.out.println(startTime + " - " + endTime);
 
-            // Update average player counts for all games
-            gameService.updateAveragePlayerCounts();
         };
     }
 }

@@ -45,7 +45,7 @@ public class GameConfig {
     }
 
     @Bean
-    CommandLineRunner addGames(GameRepository repository) {
+    CommandLineRunner addGames(GameRepository repository, GameService gameService) {
         return args -> {
 
             fillAppIds();
@@ -110,6 +110,7 @@ public class GameConfig {
                             Game game = new Game(appId, name, developer, releaseDate, headerImage);
                             if (existingGame.isPresent()) {
                                 game.setAveragePlayerCount(existingGame.get().getAveragePlayerCount());
+                                gameService.updateAveragePlayerCount(appId);
                             }
                             System.out.println("Going to add " + game);
                             games.add(game);
