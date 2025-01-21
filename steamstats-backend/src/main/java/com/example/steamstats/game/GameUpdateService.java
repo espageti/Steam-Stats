@@ -2,6 +2,7 @@ package com.example.steamstats.game;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 
+@Profile("debug") //does not need to load, dynos restart constantly
 @Service
 public class GameUpdateService {
 

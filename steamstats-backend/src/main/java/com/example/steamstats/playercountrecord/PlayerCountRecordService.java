@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,6 +34,7 @@ private static final int REQUEST_DELAY_MS = 1500;
 
         // Retrieve all games from the repository
         List<Game> games = gameRepository.findAll();
+        Collections.shuffle(games);
 
         int index = 0;
         int numGames = games.size();

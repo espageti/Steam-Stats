@@ -8,10 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Configuration
 @Profile({"debug", "setup"}) //only load all that stuff if it's in debug mode
@@ -58,7 +55,12 @@ public class GameConfig {
             int i = 0;
             int num = 0;
             long numGames = Globals.APP_IDs.size();
-            for (long appId : Globals.APP_IDs) {
+
+            // Convert HashSet to List and shuffle it, so hopefully every will be done on average
+            List<Long> shuffledAppIds = new ArrayList<>(Globals.APP_IDs);
+            Collections.shuffle(shuffledAppIds);
+
+            for (long appId : shuffledAppIds) {
                 boolean rateLimit = false;
                 i++;
                 num++;
@@ -109,7 +111,6 @@ public class GameConfig {
 
                             Game game = new Game(appId, name, developer, releaseDate, headerImage);
                             if (existingGame.isPresent()) {
-                                game.setAveragePlayerCount(existingGame.get().getAveragePlayerCount());
                                 gameService.updateAveragePlayerCount(appId);
                             }
                             System.out.println("Going to add " + game);
