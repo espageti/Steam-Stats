@@ -3,7 +3,7 @@ import { getGamesByPage } from '../constants/apiService'; // Updated service for
 import { Link } from 'react-router-dom';
 
 const GamesList = () => {
-  const [games, setGames] = useState([]); // Initialize as an empty array\
+  const [games, setGames] = useState([]); // Initialize as an empty array
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ const GamesList = () => {
     const fetchGames = async () => {
       try {
         const data = await getGamesByPage(currentPage, 100); // Provide default values in case of undefined
-        setGames(data); // Ensure data is always an array\
+        setGames(data); // Ensure data is always an array
       } catch (error) {
         console.error('Failed to fetch games:', error); // Log any errors
       }
@@ -28,13 +28,12 @@ const GamesList = () => {
     setCurrentPage(prev => prev - 1);
   };
 
-
   return (
-    <div style = {{textAlign: 'center'}}>
+    <div style={{ textAlign: 'center' }}>
       <h2>Games List</h2>
 
       {/* Games Table */}
-      <div style = {{display: 'inline-block'}}>
+      <div style={{ display: 'inline-block' }}>
         <table>
           <thead>
             <tr>
@@ -48,7 +47,12 @@ const GamesList = () => {
               games.map(game => (
                 <tr key={game.appId}>
                   <td>{game.appId}</td>
-                  <td>
+                  <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img 
+                      src={game.headerImage} 
+                      alt={game.title} 
+                      style={{ width: '120px', height: '60px', objectFit: 'cover' }} 
+                    />
                     <Link to={`/games/${game.appId}`}>{game.title}</Link>
                   </td>
                   <td>{game.averagePlayerCount ? game.averagePlayerCount.toLocaleString() : 'N/A'}</td>
